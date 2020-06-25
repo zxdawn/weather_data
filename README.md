@@ -9,3 +9,10 @@ Supported products:
 - Cloud Property (CLP)
 - Photosynthetically Available Radiation (PAR)
 
+
+## ERA5
+
+Supported data:
+
+- pressure level data
+- model level data
