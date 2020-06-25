@@ -5,7 +5,7 @@ Scripts of downloading weather data (satellite and reanalysis data)
 
 Supported products:
 
-- ARP
-- CLP
-- PAR
+- Aerosol Property (ARP)
+- Cloud Property (CLP)
+- Photosynthetically Available Radiation (PAR)
 
