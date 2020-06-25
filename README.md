@@ -14,5 +14,5 @@ Supported products:
 
 Supported data:
 
-- pressure level data
-- model level data
+- Pressure level data
+- Model level data
