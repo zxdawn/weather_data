@@ -27,12 +27,9 @@ Local directory structure:
 
 ```
 /<save_path>
-    +---/L2
-        +---/[PRODUCT]
-            +---/[VER]
-                +---/[YYYYMM]
-                    +---/[DD]
-                        +---/[hh]
+	+---/[YYYYMMDD]
+		+---/[DD]
+			+---/[hh]
 ```
 
 ### Supported L2 products
