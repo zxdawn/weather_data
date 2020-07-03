@@ -31,5 +31,15 @@ Real time FTP: <<http://fy4.nsmc.org.cn/data/en/data/realtime.html>>
    $ ./download_fy.sh
    ```
 
+   Example of the bash script:
+
+   ```
+   #!/bin/bash
+   lftp -e "mget -c ftp://AO20200701000066936:Uo6O5__j@ftp.nsmc.org.cn/*" &
+   lftp -e "mget -c ftp://AO20200701000065328:0lK_rxpW@ftp.nsmc.org.cn/AO202007010000653280001/*" &
+   lftp -e "mget -c ftp://AO20200701000065328:0lK_rxpW@ftp.nsmc.org.cn/AO202007010000653280002/*" &
+   lftp -e "mget -c ftp://AO20200701000065328:0lK_rxpW@ftp.nsmc.org.cn/AO202007010000653280003/*" &
+   ```
+
    ​
 
