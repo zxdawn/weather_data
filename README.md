@@ -1,6 +1,13 @@
 # weather_data
 Scripts of downloading weather data (satellite and reanalysis data)
 
+## ERA5
+
+Supported data:
+
+- Pressure level data
+- Model level data
+
 ## H8: Himawari-8 Level 2 data
 
 Supported products:
@@ -10,9 +17,8 @@ Supported products:
 - Photosynthetically Available Radiation (PAR)
 
 
-## ERA5
+## FY
 
 Supported data:
 
-- Pressure level data
-- Model level data
+- All ordered data on the FY satellite website
