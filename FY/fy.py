@@ -1,9 +1,12 @@
+import re
 import time
 import logging
 import getpass
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 homepage = 'http://satellite.nsmc.org.cn/portalsite/default.aspx'
 driver_path = '/usr/bin/chromedriver'  # path of chrome driver
@@ -40,7 +43,7 @@ def login(url):
 
     # Click login button
     driver.find_element_by_id('btnLogin').click()
-    time.sleep(2)
+    time.sleep(5)
 
     return driver
 
@@ -87,19 +90,46 @@ def get_orders(driver):
 
     # cherry pick all of the <a>'s that are inside of each 7nd column "Download"
     # https://stackoverflow.com/questions/36270040/selenium-pull-href-out-of-td-in-table
-    logging.info('Get all links')
-    base_links = driver.find_elements_by_css_selector('#displayOrdersList tbody tr td:nth-child(7) a')
     links = []
+    prefix_sublink = {}
+
+    logging.info('Get basic links')
+    base_links = driver.find_elements_by_css_selector('#displayOrdersList tbody tr td:nth-child(7) a')
     for link in base_links:
         base_link = link.get_attribute('href')
         job_id = base_link.split(':')[1].replace('//', '')
         if job_id in sub_links:
-            links.append(base_link+job_id+'0001/*')
-            links.append(base_link+job_id+'0002/*')
-            links.append(base_link+job_id+'0003/*')
+            # save the prefix of sublink
+            #   the prefix has the username and password for ftp links
+            prefix_sublink[job_id] = base_link
         else:
             links.append(base_link+'*')
-    logging.debug(f'Basic links: {links}')
+
+    logging.info('Get sub links')
+    # # if one order has large file numbers, we need to click the img to show all the links
+    for img in imgs:
+        img.click()
+    time.sleep(10)
+
+    # if one order has large file numbers, we need to click the img to show all the links
+    sub_tds = WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, "//tr[@class='trInfo']")))
+    for sub_td in sub_tds:
+        for sub_link in sub_td.find_elements_by_css_selector('td:nth-child(1) a'):
+            '''
+            Example of the link in a href:
+                    http://satellite.nsmc.org.cn/PortalSite/Ord/OrderStatus.aspx?
+                    orderTimeType=0&orderType=1&
+                    orderCode=A202101230507088073&
+                    fillOrderCode=A2021012305070880730006
+            '''
+            split_sublink = re.split('orderCode=|&fillOrderCode=', sub_link.get_attribute('href'))
+            order_code = split_sublink[1]
+            links.append(prefix_sublink[order_code]+split_sublink[2]+'/*')
+
+    # delete duplicated links
+    links = list(sorted(set(links)))
+
+    logging.debug(f'All Links: {links}')
 
     return links
 
