@@ -8,16 +8,21 @@ Supported data:
 - Pressure level data
 - Model level data
 
-## H8: Himawari-8 Level 2 data
+## H8 (Himawari-8)
 
-Supported products:
+### JAXA 
 
+- L1 (2 km and 5 km)
 - Aerosol Property (ARP)
 - Cloud Property (CLP)
 - Photosynthetically Available Radiation (PAR)
 
+### CEReS 
 
-## FY
+- gridded L1 Full-Disk data
+
+
+## FY (Feng-Yun)
 
 Supported data:
 
