@@ -1,3 +1,13 @@
+'''
+FUNCTION:
+    Download Himawari-8 JAXA data using one script
+
+UPDATE:
+    Xin Zhang:
+       06/25/2020: support L2 data
+       01/31/2021: support L1 data
+'''
+
 import os
 import sys
 import click
@@ -8,7 +18,7 @@ from datetime import datetime
 from datetime import timedelta
 
 
-def files_list(d1, d2, tstep, product):
+def files_list(d1, d2, tstep, product, resolution):
     '''
     Generate filenames by time step
     https://stackoverflow.com/questions/
@@ -23,10 +33,18 @@ def files_list(d1, d2, tstep, product):
         files.append(d1 + timedelta(seconds=i))
 
     # get all files from sdate to edate by tstep
-    files = [date.strftime('%Y%m/%d/%H/') +
-             f'*H08_{date.strftime("%Y%m%d_%H%M")}_*_FLDK*nc'
-             for date in files]
-
+    if product != 'L1':
+        files = [date.strftime('%Y%m/%d/%H/') +
+                 f'*H08_{date.strftime("%Y%m%d_%H%M")}_*_FLDK*nc'
+                 for date in files]
+    elif resolution == '2km':
+        files = [date.strftime('%Y%m/%d/') +
+                 f'*H08_{date.strftime("%Y%m%d_%H%M")}_*_FLDK.06001_06001.nc'
+                 for date in files]
+    else:
+        files = [date.strftime('%Y%m/%d/') +
+                         f'*H08_{date.strftime("%Y%m%d_%H%M")}_*_FLDK.02401_02401.nc'
+                         for date in files]
     return files
 
 
@@ -34,17 +52,21 @@ def downloadFiles(ftp, source, product, file, destination, debug):
     '''
     Download files of newest version
     '''
-    # omit 'bet' version
-    files = [os.path.basename(f) for f in ftp.nlst(source+product) if os.path.basename(f).isdigit()]
-    # get the newest version
-    version = sorted(files, key=lambda x: float(x))[-1]
+    if product != 'L1':
+        # omit 'bet' version
+        files = [os.path.basename(f) for f in ftp.nlst(source+product) if os.path.basename(f).isdigit()]
+        # get the newest version
+        version = sorted(files, key=lambda x: float(x))[-1]
+        data_dir = os.path.dirname(source+product+'/'+version+'/'+file)
+    else:
+        data_dir = os.path.dirname(source+file)
 
     try:
-        ftp.cwd(os.path.dirname(source+product+'/'+version+'/'+file))
+        ftp.cwd(data_dir)
     except OSError:
         pass
     except ftplib.error_perm:
-        print('Error: could not change to ' + os.path.dirname(source+product+'/'+version+'/'+file))
+        print(f'Error: could not change to {data_dir}')
         return 0
 
     filename = ntpath.basename(file)
@@ -116,11 +138,23 @@ def downloadFiles(ftp, source, product, file, destination, debug):
 @click.option(
     '--product',
     '-p',
-    type=click.Choice(['ARP', 'CLP', 'PAR']),
-    default='CLP',
+    type=click.Choice(['L1', 'ARP', 'CLP', 'PAR']),
+    default='L1',
     help='''
             Product name in Capital.
-            ARP, CLP or PAR
+            L1, ARP, CLP or PAR
+         ''',
+    show_default=True,
+)
+
+@click.option(
+    '--resolution',
+    '-r',
+    type=click.Choice(['2km', '5km']),
+    default='5km',
+    help='''
+            Resolution of the L1 product.
+            2km or 5km
          ''',
     show_default=True,
 )
@@ -148,29 +182,38 @@ def downloadFiles(ftp, source, product, file, destination, debug):
 )
 
 
-def main(save_path, sdate, edate, tstep,
-         product, username, password, debug):
+def main(save_path,
+         sdate, edate, tstep,
+         product, resolution,
+         username, password,
+         debug):
     '''
     \b
     Fuctions:
-        Download Himawari-8 Level 2 products from JAXA and save to directories
+        Download Himawari-8 Level 1 and Level 2 products from JAXA and save to directories
     Contact:
         xinzhang1215@gmail.com
     '''
+    # get the base url
     server = 'ftp.ptree.jaxa.jp'  # JAXA data server
-    source = '/pub/himawari/L2/'
-    save_path = os.path.join(save_path, "")
+
+    if product == 'L1':
+        source = '/jma/netcdf/' # Level 1
+    else:
+        source = '/pub/himawari/L2/' # Level 2
 
     # get the list of datetime from sdate to edate by day
     d1 = datetime.strptime(sdate, '%Y-%m-%d_%H:%M')
     d2 = datetime.strptime(edate, '%Y-%m-%d_%H:%M')
 
     # get filenames based on dates
-    files = files_list(d1, d2, tstep, product)
+    files = files_list(d1, d2, tstep, product, resolution)
 
+    # log into the server
     ftp = ftplib.FTP(server)
     ftp.login(username, password)
 
+    save_path = os.path.join(save_path, "")
     for file in tqdm(files, desc='total progress'):
         # iterate and download files
         filename = ntpath.basename(file)
