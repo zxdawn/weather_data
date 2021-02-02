@@ -75,10 +75,6 @@ def downloadFiles(ftp, source, product, file, destination, debug):
         ftp.sendcmd('TYPE I')
         filesize = ftp.size(filename)
 
-        # create directory
-        if not os.path.exists(os.path.dirname(destination)):
-            os.makedirs(os.path.dirname(destination))
-
         # download data
         with open(os.path.dirname(destination)+'/'+filename, 'wb') as f:
             # set progress bar
@@ -219,14 +215,23 @@ def main(save_path,
         filename = ntpath.basename(file)
         destination = os.path.join(save_path+file)
 
+        # create directory
+        if not os.path.exists(os.path.dirname(destination)):
+            os.makedirs(os.path.dirname(destination))
+
         if debug > 0:
             print('Downloading ' + filename + ' ...')
 
+        if glob(destination+filename):
+            if debug > 0:
+                print(filename + ' exists ...')
+            continue
+
         file_exist = downloadFiles(ftp, source, product, file, destination, debug)
 
-        # skip following steps if file isn't found
-        if not file_exist:
-            continue
+        # # skip following steps if file isn't found
+        # if not file_exist:
+        #     continue
 
 
 if __name__ == '__main__':
