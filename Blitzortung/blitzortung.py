@@ -80,7 +80,7 @@ def main(save_path,
                           end=edate.replace('_', ' '),
                           freq='5Min')
     urls = dates.strftime(f'{base_url}/%Y/%m/%d/%H/%M/image_b_{region}.png')
-    savenames = dates.strftime(f'{save_path}/%Y%m%d/%Y%m%d_%H%M.png')
+    savenames = dates.strftime(f'{save_path}/{region}/%Y%m%d/%Y%m%d_%H%M.png')
 
     # download the background first
     bg_savename = f'{save_path}/bg_{region}.png'
