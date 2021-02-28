@@ -80,11 +80,7 @@ def main(save_path,
                           end=edate.replace('_', ' '),
                           freq='5Min')
     urls = dates.strftime(f'{base_url}/%Y/%m/%d/%H/%M/image_b_{region}.png')
-    savenames = dates.strftime(f'{save_path}/%Y%m%d_%H%M.png')
-
-    # create directory
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    savenames = dates.strftime(f'{save_path}/%Y%m%d/%Y%m%d_%H%M.png')
 
     # download the background first
     bg_savename = f'{save_path}/bg_{region}.png'
@@ -94,10 +90,15 @@ def main(save_path,
     # download the transparent png file and
     #   overlay it on the background downloaded before
     for index, url in enumerate(tqdm(urls, desc='total progress')):
-        if not os.path.exists(savenames[index]):
-            urllib.request.urlretrieve(url, savenames[index])
-            fg = Image.open(savenames[index])
-            Image.alpha_composite(bg, fg.convert('RGBA')).save(savenames[index], 'PNG')
+        savename = savenames[index]
+        # create directory
+        if not os.path.exists(os.path.dirname(savename)):
+            os.makedirs(os.path.dirname(savename))
+
+        if not os.path.exists(savename):
+            urllib.request.urlretrieve(url, savename)
+            fg = Image.open(savename)
+            Image.alpha_composite(bg, fg.convert('RGBA')).save(savename, 'PNG')
         else:
             continue
 
