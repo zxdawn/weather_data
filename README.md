@@ -1,9 +1,13 @@
 # weather_data
 Scripts of downloading weather data (satellite and reanalysis data)
 
-## ERA5
+Please check `README.md` files under each directory for detailed usage.
 
-Supported data:
+## Blitzortung
+
+- Historical lightning Maps
+
+## ERA5
 
 - Pressure level data
 - Model level data
