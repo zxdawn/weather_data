@@ -14,6 +14,7 @@ import click
 import ftplib
 import ntpath
 from tqdm import tqdm
+from glob import glob
 from datetime import datetime
 from datetime import timedelta
 
