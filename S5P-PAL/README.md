@@ -8,13 +8,13 @@ Sentinel-5P Product Algorithm Laboratory (S5P-PAL): https://data-portal.s5p-pal.
 
 The S5P-PAL [official tutorial](https://data-portal.s5p-pal.com/cat-doc) uses PySTAC to download data in a short period. It's useful for case studies.
 
-The Python scripts in the repository aim to download both short-term and long-term TROPOMI NO2 data from S5P-PAL.
+The Python scripts in the repository support downloading both short-term and long-term TROPOMI NO2 data from S5P-PAL.
 
 ### Step 1
 
 Get all the download links and save to one csv file named `s5p_portal_links.csv`.
 
-You need to install three basic Python packages  (*requests, numpy, and pandas*) to run the script:
+You only need to install three basic Python packages  (*requests, numpy, and pandas*) to run the script:
 
 ```
 python fetch_s5p_portal_links.py
@@ -42,7 +42,7 @@ awk '(NR>1) {print $1, $2}' 20190601_20190831.csv | xargs -n 2 -P 2 wget --no-ch
 
 ## Procedures
 
-In case you're interested in how the scripts work, you can check the comments in `subset_s5p_portal_links.py`.
+In case you're interested in how the scripts work, you can check the comments in `fetch_s5p_portal_links.py`.
 
 ## ~ Enjoy your study ~
 
