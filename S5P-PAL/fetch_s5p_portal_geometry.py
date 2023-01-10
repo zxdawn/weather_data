@@ -14,14 +14,22 @@ import geopandas as gpd
 from fetch_s5p_portal_links import all_links
 from shapely.geometry import Polygon, MultiPolygon
 
+world_geo = [[-180.0, -90.0],
+             [180.0, -90.0],
+             [180.0, 90.0],
+             [-180.0, 90.0],
+             [-180.0, -90.0]]
 
 def read_geometry(coordinates):
     '''Generate the plygon or multipolygon for geometry'''
-    if len(coordinates) == 1:
-        geometry = Polygon(coordinates[0])
-    else:
-        geometry = MultiPolygon([Polygon(r[0]) for r in coordinates])
-    
+    geometry = MultiPolygon([Polygon(r[0]) if len(r)==1 else Polygon(r) for r in coordinates])
+    # sometime the polygon is wrong
+    #   https://github.com/zxdawn/weather_data/issues/4
+    if (coordinates[0] == world_geo) & (len(coordinates)==2):
+        geometry = geometry.geoms[0].difference(geometry.geoms[1])
+    elif (coordinates[0] == world_geo) & (len(coordinates)!=2):
+        print(f'!'*20, 'The geometry is wrong. Please check the coords: {coordinates}')
+
     return geometry
 
 def read_fields(data_json):
