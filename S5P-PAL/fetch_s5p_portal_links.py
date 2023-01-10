@@ -67,7 +67,7 @@ def read_fields(data_json):
 
     return df
 
-def main():
+def all_links():
     # read the home catalog json file
     catalog_link = 'https://data-portal.s5p-pal.com/cat/sentinel-5p/catalog.json'
     catalog = requests.get(catalog_link)
@@ -85,6 +85,11 @@ def main():
     # get several search links by a step of 50
     search_links = get_link(search_json, total_num)
 
+    return search_links, total_num
+
+
+def main():
+    search_links, total_num = all_links()
     for index, search_link in enumerate(search_links):
         print(f'Fetching download link [{index+1}/{len(search_links)}]')
         data_json = requests.get(search_link).json()
