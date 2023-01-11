@@ -12,30 +12,13 @@ import requests
 import pandas as pd
 import geopandas as gpd
 from fetch_s5p_portal_links import all_links
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import shape, Polygon, MultiPolygon
 
-world_geo = [[-180.0, -90.0],
-             [180.0, -90.0],
-             [180.0, 90.0],
-             [-180.0, 90.0],
-             [-180.0, -90.0]]
-
-def read_geometry(coordinates):
-    '''Generate the plygon or multipolygon for geometry'''
-    geometry = MultiPolygon([Polygon(r[0]) if len(r)==1 else Polygon(r) for r in coordinates])
-    # sometime the polygon is wrong
-    #   https://github.com/zxdawn/weather_data/issues/4
-    if (coordinates[0] == world_geo) & (len(coordinates)==2):
-        geometry = geometry.geoms[0].difference(geometry.geoms[1])
-    elif (coordinates[0] == world_geo) & (len(coordinates)!=2):
-        print(f'!'*20, 'The geometry is wrong. Please check the coords: {coordinates}')
-
-    return geometry
 
 def read_fields(data_json):
     '''Read useful fields'''
     filenames = [feature['id']+'.nc' for feature in data_json['features']]
-    geometry = [read_geometry(feature['geometry']['coordinates']) for feature in data_json['features']]
+    geometry = [shape(feature['geometry']) for feature in data_json['features']]
 
 
     # create the Geo DataFrame
